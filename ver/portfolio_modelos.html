@@ -1,0 +1,135 @@
+
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=DM+Mono:wght@300;400;500&display=swap');
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'DM Mono', monospace; }
+  .pf-wrap { padding: 0; }
+  .pf-header { display: flex; justify-content: space-between; align-items: flex-end; padding: 1.5rem 1.5rem 1rem; border-bottom: 0.5px solid var(--color-border-tertiary); }
+  .pf-logo { font-family: 'Playfair Display', serif; font-size: 2rem; font-weight: 900; color: var(--color-text-primary); line-height: 1; }
+  .pf-logo span { color: #D85A30; }
+  .pf-meta { font-size: 11px; color: var(--color-text-secondary); text-align: right; line-height: 1.6; }
+  .pf-counter { display: flex; gap: 2rem; padding: 0.75rem 1.5rem; border-bottom: 0.5px solid var(--color-border-tertiary); font-size: 11px; color: var(--color-text-secondary); }
+  .pf-counter span { color: var(--color-text-primary); font-weight: 500; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 0; }
+  .card { position: relative; cursor: pointer; border-right: 0.5px solid var(--color-border-tertiary); border-bottom: 0.5px solid var(--color-border-tertiary); overflow: hidden; background: var(--color-background-primary); transition: background 0.2s; }
+  .card:hover { background: var(--color-background-secondary); }
+  .card-accent { height: 3px; background: #D85A30; width: 0; transition: width 0.3s; }
+  .card:hover .card-accent { width: 100%; }
+  .card-img { width: 100%; height: 160px; object-fit: cover; display: block; filter: grayscale(20%); transition: filter 0.3s; }
+  .card:hover .card-img { filter: grayscale(0%); }
+  .card-body { padding: 0.75rem 1rem; }
+  .card-tag { font-size: 9px; color: var(--color-text-secondary); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 4px; }
+  .card-title { font-family: 'Playfair Display', serif; font-size: 1rem; font-weight: 700; color: var(--color-text-primary); margin-bottom: 2px; }
+  .card-url { font-size: 9px; color: var(--color-text-secondary); margin-bottom: 0.5rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .card-num { font-size: 11px; color: var(--color-text-secondary); }
+  .pf-footer { padding: 0.75rem 1.5rem; border-top: 0.5px solid var(--color-border-tertiary); display: flex; justify-content: space-between; font-size: 10px; color: var(--color-text-secondary); }
+
+  .overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 100; display: flex; align-items: center; justify-content: center; padding: 1rem; opacity: 0; pointer-events: none; transition: opacity 0.25s; }
+  .overlay.open { opacity: 1; pointer-events: all; }
+  .modal { background: var(--color-background-primary); border-radius: var(--border-radius-lg); width: 100%; max-width: 500px; max-height: 90vh; overflow-y: auto; border: 0.5px solid var(--color-border-secondary); transform: translateY(20px); transition: transform 0.25s; }
+  .overlay.open .modal { transform: translateY(0); }
+  .modal-img-wrap { position: relative; }
+  .modal-img { width: 100%; height: 260px; object-fit: cover; display: block; border-radius: var(--border-radius-lg) var(--border-radius-lg) 0 0; }
+  .modal-accent { height: 4px; background: #D85A30; }
+  .modal-close { position: absolute; top: 12px; right: 12px; width: 32px; height: 32px; border-radius: 50%; background: rgba(0,0,0,0.6); border: none; color: #fff; font-size: 16px; cursor: pointer; display: flex; align-items: center; justify-content: center; line-height: 1; }
+  .modal-body { padding: 1.25rem 1.5rem 1.5rem; }
+  .modal-tag { font-size: 10px; color: var(--color-text-secondary); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 6px; }
+  .modal-title { font-family: 'Playfair Display', serif; font-size: 1.75rem; font-weight: 700; color: var(--color-text-primary); margin-bottom: 0.25rem; }
+  .modal-url { font-size: 11px; color: var(--color-text-secondary); margin-bottom: 1.25rem; }
+  .photos-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-bottom: 1.25rem; }
+  .photos-row img { width: 100%; height: 80px; object-fit: cover; border-radius: var(--border-radius-md); }
+  .modal-btn { display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; padding: 0.75rem; background: #D85A30; color: #fff; border: none; border-radius: var(--border-radius-md); font-family: 'DM Mono', monospace; font-size: 13px; font-weight: 500; cursor: pointer; text-decoration: none; transition: background 0.2s; letter-spacing: 0.03em; }
+  .modal-btn:hover { background: #993C1D; }
+  .modal-btn svg { width: 14px; height: 14px; flex-shrink: 0; }
+</style>
+
+<div class="pf-wrap">
+  <div class="pf-header">
+    <div class="pf-logo">M Port<span>.</span><br>folio</div>
+    <div class="pf-meta">
+      <div>Proyectos Web</div>
+      <div>2026</div>
+    </div>
+  </div>
+  <div class="pf-counter">
+    <div>Proyectos: <span>08</span></div>
+    <div>Estado: <span>Activo</span></div>
+    <div>Actualización: <span>Mar 2026</span></div>
+  </div>
+
+  <div class="grid" id="grid"></div>
+
+  <div class="pf-footer">
+    <span>© 2026 Portafolio</span>
+    <span>8 Model Profiles Online</span>
+  </div>
+</div>
+
+<div class="overlay" id="overlay" onclick="closeModal(event)">
+  <div class="modal" id="modal">
+    <div class="modal-img-wrap">
+      <img class="modal-img" id="m-img" src="" alt="">
+      <div class="modal-accent"></div>
+      <button class="modal-close" onclick="closeOverlay()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="modal-tag" id="m-tag"></div>
+      <div class="modal-title" id="m-title"></div>
+      <div class="modal-url" id="m-url"></div>
+      <div class="photos-row" id="m-photos"></div>
+      <a class="modal-btn" id="m-link" href="#" target="_blank" rel="noopener">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 8h12M8 2l6 6-6 6"/></svg>
+        Visitar perfil
+      </a>
+    </div>
+  </div>
+</div>
+
+<script>
+const models = [
+  { num:'01', tag:'Streaming · Proyecto 01', title:'Tiffany Spears', url:'livejasmin.com/TiffanySpears', img:'images/msc.jpg', link:'https://www.livejasmin.com/en/free/chat/TiffanySpears?languageChange=1' },
+  { num:'02', tag:'Streaming · Proyecto 02', title:'Kathe Salvatore', url:'livejasmin.com/KatheSalvatore', img:'images/kts.jpg', link:'https://www.livejasmin.com/en/chat/KatheSalvatore' },
+  { num:'03', tag:'Social Media · Proyecto 03', title:'Paula Stivens', url:'paulastivens.com', img:'images/sps.jpg', link:'https://www.livejasmin.com/en/chat/PaulaStivens?languageChange=1' },
+  { num:'04', tag:'Social Media · Proyecto 04', title:'Caylin & Liza', url:'es.recu.me/caylin_and_liza', img:'images/lvc.jpg', link:'https://es.cumcams.cc/performer/victoriacolin' },
+  { num:'05', tag:'Streaming · Proyecto 05', title:'Lea Noira', url:'livejasmin.com/LeaNoira', img:'images/kt.jpg', link:'https://www.livejasmin.com/en/free/chat/LeaNoira' },
+  { num:'06', tag:'Streaming · Proyecto 06', title:'Lizz Connor', url:'livejasmin.com/LizzConnor', img:'images/ksc.jpg', link:'https://www.livejasmin.com/en/free/chat/LizzConnor' },
+  { num:'07', tag:'Streaming · Proyecto 07', title:'Alaya1991', url:'savemycam.com/alaya1991', img:'images/la.jpg', link:'https://savemycam.com/alaya1991' },
+  { num:'08', tag:'Streaming · Proyecto 08', title:'Michell-Ass', url:'camsoda.com/michell-ass', img:'images/ma.png', link:'https://www.camsoda.com/michell-ass/bio' },
+];
+
+const grid = document.getElementById('grid');
+models.forEach((m, i) => {
+  grid.innerHTML += `
+    <div class="card" onclick="openModel(${i})">
+      <div class="card-accent"></div>
+      <img class="card-img" src="${m.img}" alt="${m.title}" onerror="this.style.background='var(--color-background-secondary)';this.style.height='160px'">
+      <div class="card-body">
+        <div class="card-tag">${m.tag}</div>
+        <div class="card-title">${m.title}</div>
+        <div class="card-url">${m.url}</div>
+        <div class="card-num">${m.num}</div>
+      </div>
+    </div>`;
+});
+
+function openModel(i) {
+  const m = models[i];
+  document.getElementById('m-img').src = m.img;
+  document.getElementById('m-img').alt = m.title;
+  document.getElementById('m-tag').textContent = m.tag;
+  document.getElementById('m-title').textContent = m.title;
+  document.getElementById('m-url').textContent = m.url;
+  document.getElementById('m-link').href = m.link;
+  const ph = document.getElementById('m-photos');
+  ph.innerHTML = `<img src="${m.img}" alt="${m.title}"><img src="${m.img}" alt="${m.title}"><img src="${m.img}" alt="${m.title}">`;
+  document.getElementById('overlay').classList.add('open');
+}
+
+function closeOverlay() {
+  document.getElementById('overlay').classList.remove('open');
+}
+
+function closeModal(e) {
+  if (e.target === document.getElementById('overlay')) closeOverlay();
+}
+</script>
